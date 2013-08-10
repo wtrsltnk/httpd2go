@@ -1,0 +1,6 @@
+mysqld 	--basedir=path --port=port_num --log[=file_name] --log-error[=file_name]
+
+http://dev.mysql.com/doc/refman/5.1/en/server-options.html
+
+
+mysqld --basedir=C:\Users\Trinicom\Desktop\Misc\Downloads\mariadb-5.5.32-win32 --port=55022 --general-log=ON --general-log-file=maria-log.txt

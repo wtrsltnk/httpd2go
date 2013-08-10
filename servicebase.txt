@@ -1,0 +1,9 @@
+start:
+httpd.exe -k install -n "httpd2go" -d "server root" -f "configfile.conf"
+httpd.exe -k start -n "httpd2go"
+
+stop:
+httpd.exe -k shutdown -n "httpd2go"
+httpd.exe -k uninstall -n "httpd2go"
+
+http://httpd.apache.org/docs/2.4/platform/windows.html#winsvc
