@@ -878,7 +878,7 @@ void WritePhpIni(std::ofstream& stream) {
 	stream << ";extension=php_gettext.dll\n";
 	stream << ";extension=php_gmp.dll\n";
 	stream << ";extension=php_intl.dll\n";
-	stream << ";extension=php_imap.dll\n";
+	stream << "extension=php_imap.dll\n";
 	stream << ";extension=php_interbase.dll\n";
 	stream << ";extension=php_ldap.dll\n";
 	stream << ";extension=php_mbstring.dll\n";
