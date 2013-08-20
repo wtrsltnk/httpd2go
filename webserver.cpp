@@ -16,7 +16,7 @@ WebServer::~WebServer()
 bool WebServer::Start(Environment& env)
 {
     STARTUPINFO si;
-    PROCESS_INFORMATION pi;
+    PROCESS_INFORMATION pi, mysqlpi;
 
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
@@ -39,12 +39,36 @@ bool WebServer::Start(Environment& env)
         return false;
     }
 
+    if (env.hasMySQL())
+    {
+        ZeroMemory( &mysqlpi, sizeof(mysqlpi) );
+        // Start the child process.
+        CreateProcess( NULL,   // No module name (use command line)
+            (LPSTR)env.BuildMySQLCommandLine().c_str(),        // Command line
+            NULL,           // Process handle not inheritable
+            NULL,           // Thread handle not inheritable
+            FALSE,          // Set handle inheritance to FALSE
+            0,              // No creation flags
+            NULL,           // Use parent's environment block
+            NULL,           // Use parent's starting directory
+            &si,            // Pointer to STARTUPINFO structure
+            &mysqlpi )      // Pointer to PROCESS_INFORMATION structure
+        ;
+    }
+
     // Wait until child process exits.
     WaitForSingleObject( pi.hProcess, INFINITE );
+    if (env.hasMySQL())
+        WaitForSingleObject( mysqlpi.hProcess, INFINITE );
 
     // Close process and thread handles.
     CloseHandle( pi.hThread );
     CloseHandle( pi.hProcess );
+    if (env.hasMySQL())
+    {
+        CloseHandle( mysqlpi.hThread );
+        CloseHandle( mysqlpi.hProcess );
+    }
     return true;
 }
 
@@ -56,12 +80,12 @@ void WebServer::Stop()
     {
         while (Process32Next(snapshot, &entry) == TRUE)
         {
-            if (stricmp(entry.szExeFile, "httpd.exe" ) == 0)
+            if (stricmp(entry.szExeFile, "httpd.exe" ) == 0 || stricmp(entry.szExeFile, "mysqld.exe" ) == 0)
             {
                 HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, entry.th32ProcessID);
                 if (hProcess != NULL)
                 {
-                    cout << "Stopping httpd with processID: " << entry.th32ProcessID << endl;
+                    cout << "Stopping " << entry.szExeFile <<  " with processID: " << entry.th32ProcessID << endl;
                     TerminateProcess(hProcess, 0);
                     CloseHandle(hProcess);
                 }

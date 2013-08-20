@@ -26,8 +26,8 @@ int main(int argc, char*argv[])
             if (url != "")
             {
                 cout << "Starting webserver. Your project will be ready at: " << url << endl;
-                cout << "Remove the project by running: httphp.exe --delete " << args.ProjectName() << endl;
-                cout << "Stop the webserver by stopping this instance or running: httphp.exe --stop" << endl;
+                cout << "Remove the project by running: httpd2go.exe --delete " << args.ProjectName() << endl;
+                cout << "Stop the webserver by stopping this instance or running: httpd2go.exe --stop" << endl;
                 srvr.Start(env);
                 cout << "Bye!" << endl;
             }
@@ -44,7 +44,7 @@ int main(int argc, char*argv[])
                 cout << "Project " << args.ProjectName() << " deleted." << endl;
 
             cout << "Starting webserver." << endl;
-            cout << "Stop the webserver by stopping this instance or running: httphp.exe --stop" << endl;
+            cout << "Stop the webserver by stopping this instance or running: httpd2go.exe --stop" << endl;
             srvr.Start(env);
             cout << "Bye!" << endl;
         }

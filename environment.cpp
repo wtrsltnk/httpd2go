@@ -17,7 +17,7 @@ void WriteDefaultConf(std::ofstream& stream);
 void WritePhpIni(std::ofstream& stream);
 
 Environment::Environment()
-    : _ok(false)
+    : _ok(false), _hasMysql(false)
 {
     HMODULE hModule = GetModuleHandle(NULL);
     char path[MAX_PATH];
@@ -33,6 +33,7 @@ Environment::Environment()
     this->_httpd = this->_approot + "/httpd/bin/httpd.exe";
     this->_php = this->_approot + "/php/php.exe";
     this->_phpIni = this->_approot + "/php.ini";
+    this->_mysql = this->_approot + "/mysql/bin/mysqld.exe";
     this->_defaultConf = this->_approot + "/default.conf";
     this->_vhostsDirectory = this->_approot + "/vhosts/";
 
@@ -72,6 +73,12 @@ Environment::Environment()
     {
         cout << "Did not find PHP installation (php.exe) in the correct location. Must be in: " << this->_php << "."  << endl;
         return;
+    }
+
+    if (FileExists(this->_mysql))
+    {
+        this->_hasMysql = true;
+        cout << "MySQL installation found."  << endl;
     }
 
     this->_localConf = this->_approot + "/local.conf";
@@ -197,6 +204,16 @@ std::string Environment::GeneratePort()
 std::string Environment::BuildCommandLine()
 {
     return this->_httpd + " -f \"" + this->_approot + "/local.conf\"";
+}
+
+bool Environment::hasMySQL()
+{
+    return this->_hasMysql;
+}
+
+std::string Environment::BuildMySQLCommandLine()
+{
+    return this->_mysql + " --port=55022";
 }
 
 bool Environment::FileExists(string& file)
