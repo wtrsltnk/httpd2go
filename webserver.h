@@ -10,7 +10,7 @@ public:
     virtual ~WebServer();
 
     bool Start(Environment& env);
-    void Stop();
+    void Stop(Environment& env);
 };
 
 #endif // WEBSERVER_H

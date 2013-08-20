@@ -4,6 +4,8 @@
 #include <TlHelp32.h>
 #include <Psapi.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -39,32 +41,41 @@ bool WebServer::Start(Environment& env)
         return false;
     }
 
-    if (env.hasMySQL())
+    ofstream localPortFile;
+    localPortFile.open((env.Approot() + "/port.tmp").c_str());
+
+    localPortFile << pi.dwProcessId << endl;
+
+    if (env.HasMySQL())
     {
         ZeroMemory( &mysqlpi, sizeof(mysqlpi) );
         // Start the child process.
-        CreateProcess( NULL,   // No module name (use command line)
-            (LPSTR)env.BuildMySQLCommandLine().c_str(),        // Command line
-            NULL,           // Process handle not inheritable
-            NULL,           // Thread handle not inheritable
-            FALSE,          // Set handle inheritance to FALSE
-            0,              // No creation flags
-            NULL,           // Use parent's environment block
-            NULL,           // Use parent's starting directory
-            &si,            // Pointer to STARTUPINFO structure
-            &mysqlpi )      // Pointer to PROCESS_INFORMATION structure
-        ;
+        if(CreateProcess( NULL,   // No module name (use command line)
+                (LPSTR)env.BuildMySQLCommandLine().c_str(),        // Command line
+                NULL,           // Process handle not inheritable
+                NULL,           // Thread handle not inheritable
+                FALSE,          // Set handle inheritance to FALSE
+                0,              // No creation flags
+                NULL,           // Use parent's environment block
+                NULL,           // Use parent's starting directory
+                &si,            // Pointer to STARTUPINFO structure
+                &mysqlpi )      // Pointer to PROCESS_INFORMATION structure
+            )
+        {
+            localPortFile << mysqlpi.dwProcessId << endl;
+        }
     }
+    localPortFile.close();
 
     // Wait until child process exits.
     WaitForSingleObject( pi.hProcess, INFINITE );
-    if (env.hasMySQL())
+    if (env.HasMySQL())
         WaitForSingleObject( mysqlpi.hProcess, INFINITE );
 
     // Close process and thread handles.
     CloseHandle( pi.hThread );
     CloseHandle( pi.hProcess );
-    if (env.hasMySQL())
+    if (env.HasMySQL())
     {
         CloseHandle( mysqlpi.hThread );
         CloseHandle( mysqlpi.hProcess );
@@ -72,29 +83,23 @@ bool WebServer::Start(Environment& env)
     return true;
 }
 
-void WebServer::Stop()
+void WebServer::Stop(Environment& env)
 {
-    PROCESSENTRY32 entry;
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
-    if (Process32First(snapshot, &entry) == TRUE)
+    std::ifstream localPortFile ((env.Approot() + "/port.tmp").c_str(), std::ifstream::in);
+    std::string line;
+
+    while (localPortFile.good())
     {
-        while (Process32Next(snapshot, &entry) == TRUE)
+        getline(localPortFile, line);
+        int processId = atoi(line.c_str());
+        HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
+        if (hProcess != NULL)
         {
-            if (stricmp(entry.szExeFile, "httpd.exe" ) == 0 || stricmp(entry.szExeFile, "mysqld.exe" ) == 0)
-            {
-                HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, entry.th32ProcessID);
-                if (hProcess != NULL)
-                {
-                    cout << "Stopping " << entry.szExeFile <<  " with processID: " << entry.th32ProcessID << endl;
-                    TerminateProcess(hProcess, 0);
-                    CloseHandle(hProcess);
-                }
-                else
-                {
-                    cout << "Unable to open process " << GetLastError() << endl;
-                }
-            }
+            cout << "Stopping process with ID: " << processId << endl;
+            TerminateProcess(hProcess, 0);
+            CloseHandle(hProcess);
         }
     }
-    CloseHandle(snapshot);
+    localPortFile.close();
+    remove((env.Approot() + "/port.tmp").c_str());
 }

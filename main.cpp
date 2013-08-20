@@ -13,14 +13,13 @@ int main(int argc, char*argv[])
 {
     Arguments args(argc, argv);
     WebServer srvr;
+    Environment env;
 
     if (args.Ok())
     {
-        Environment env;
-
         if (env.Ok())
         {
-            srvr.Stop();
+            srvr.Stop(env);
             string url = env.CreateProject(args.ProjectPath(), args.ProjectName());
 
             if (url != "")
@@ -35,11 +34,9 @@ int main(int argc, char*argv[])
     }
     else if (args.Delete())
     {
-        Environment env;
-
         if (env.Ok())
         {
-            srvr.Stop();
+            srvr.Stop(env);
             if (env.DeleteProject(args.ProjectName()))
                 cout << "Project " << args.ProjectName() << " deleted." << endl;
 
@@ -52,7 +49,9 @@ int main(int argc, char*argv[])
     else if (args.Stop())
     {
         cout << "Stopping webserver." << endl;
-        srvr.Stop();
+        if (env.HasMySQL())
+            cout << "Stopping MySQL." << endl;
+        srvr.Stop(env);
     }
     return 0;
 }

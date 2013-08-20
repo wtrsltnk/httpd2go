@@ -14,8 +14,9 @@ public:
     bool DeleteProject(const std::string& projectName);
 
     std::string BuildCommandLine();
-    bool hasMySQL();
+    bool HasMySQL();
     std::string BuildMySQLCommandLine();
+    std::string& Approot() { return this->_approot; }
 
     static bool FileExists(std::string& file);
     static bool DirectoryExists(std::string& file);

@@ -206,7 +206,7 @@ std::string Environment::BuildCommandLine()
     return this->_httpd + " -f \"" + this->_approot + "/local.conf\"";
 }
 
-bool Environment::hasMySQL()
+bool Environment::HasMySQL()
 {
     return this->_hasMysql;
 }
