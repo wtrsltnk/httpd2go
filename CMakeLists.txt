@@ -10,6 +10,7 @@ set(src_app
         environment.cpp
         main.cpp
         php.ini.cpp
+        systray.cpp
         webserver.cpp
         ../common/tokenizer.cpp
         ../common/log.cpp

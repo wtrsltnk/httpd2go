@@ -54,7 +54,7 @@ bool WebServer::Start(Environment& env)
                 (LPSTR)env.BuildMySQLCommandLine().c_str(),        // Command line
                 NULL,           // Process handle not inheritable
                 NULL,           // Thread handle not inheritable
-                FALSE,          // Set handle inheritance to FALSE
+                TRUE,          // Set handle inheritance to FALSE
                 0,              // No creation flags
                 NULL,           // Use parent's environment block
                 NULL,           // Use parent's starting directory
@@ -68,9 +68,9 @@ bool WebServer::Start(Environment& env)
     localPortFile.close();
 
     // Wait until child process exits.
-    WaitForSingleObject( pi.hProcess, INFINITE );
+    WaitForSingleObject( pi.hProcess, 100 );
     if (env.HasMySQL())
-        WaitForSingleObject( mysqlpi.hProcess, INFINITE );
+        WaitForSingleObject( mysqlpi.hProcess, 100 );
 
     // Close process and thread handles.
     CloseHandle( pi.hThread );
@@ -83,6 +83,46 @@ bool WebServer::Start(Environment& env)
     return true;
 }
 
+void StopProcess(int pid)
+{
+    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    if (hProcess != NULL)
+    {
+        cout << "Stopping process with ID: " << pid << endl;
+        TerminateProcess(hProcess, 0);
+        CloseHandle(hProcess);
+    }
+}
+
+void CloseChildProcesses()
+{
+    PROCESSENTRY32 entry;
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+    if (Process32First(snapshot, &entry) == TRUE)
+    {
+        while (Process32Next(snapshot, &entry) == TRUE)
+        {
+            if (stricmp(entry.szExeFile, "httpd.exe" ) == 0)
+            {
+                HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+                PROCESSENTRY32 pe = { 0 };
+                pe.dwSize = sizeof(PROCESSENTRY32);
+
+                if( Process32First(h, &pe)) {
+                    do {
+                        if (pe.th32ProcessID == entry.th32ProcessID) {
+                            StopProcess(entry.th32ProcessID);
+                        }
+                    } while( Process32Next(h, &pe));
+                }
+
+                CloseHandle(h);
+            }
+        }
+    }
+    CloseHandle(snapshot);
+}
+
 void WebServer::Stop(Environment& env)
 {
     std::ifstream localPortFile ((env.Approot() + "/port.tmp").c_str(), std::ifstream::in);
@@ -92,14 +132,11 @@ void WebServer::Stop(Environment& env)
     {
         getline(localPortFile, line);
         int processId = atoi(line.c_str());
-        HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
-        if (hProcess != NULL)
-        {
-            cout << "Stopping process with ID: " << processId << endl;
-            TerminateProcess(hProcess, 0);
-            CloseHandle(hProcess);
-        }
+        StopProcess(processId);
     }
     localPortFile.close();
     remove((env.Approot() + "/port.tmp").c_str());
+
+    // Nu gaan we child processen zoeken die gestart zijn
+    CloseChildProcesses();
 }

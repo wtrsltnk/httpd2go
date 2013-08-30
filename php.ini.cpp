@@ -922,7 +922,7 @@ void WritePhpIni(std::ofstream& stream) {
 	stream << "[Date]\n";
 	stream << "; Defines the default timezone used by the date functions\n";
 	stream << "; http://php.net/date.timezone\n";
-	stream << ";date.timezone =\n";
+    stream << "date.timezone = \"Europe/Amsterdam\"\n";
 	stream << "\n";
 	stream << "; http://php.net/date.default-latitude\n";
 	stream << ";date.default_latitude = 31.7667\n";

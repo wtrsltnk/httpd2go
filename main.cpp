@@ -6,6 +6,7 @@
 #include "arguments.h"
 #include "environment.h"
 #include "webserver.h"
+#include "systray.h"
 
 using namespace std;
 
@@ -53,7 +54,8 @@ int main(int argc, char*argv[])
             cout << "Stopping MySQL." << endl;
         srvr.Stop(env);
     }
-    return 0;
+
+    return StartSystray(&srvr, &env);
 }
 
 
