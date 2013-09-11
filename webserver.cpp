@@ -25,17 +25,17 @@ bool WebServer::Start(Environment& env)
     ZeroMemory( &pi, sizeof(pi) );
 
     // Start the child process.
-    if( !CreateProcess( NULL,   // No module name (use command line)
-        (LPSTR)env.BuildCommandLine().c_str(),        // Command line
-        NULL,           // Process handle not inheritable
-        NULL,           // Thread handle not inheritable
-        FALSE,          // Set handle inheritance to FALSE
-        0,              // No creation flags
-        NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory
-        &si,            // Pointer to STARTUPINFO structure
-        &pi )           // Pointer to PROCESS_INFORMATION structure
-    )
+    if( !CreateProcess( NULL,
+            (LPSTR)env.BuildCommandLine().c_str(),
+            NULL,
+            NULL,
+            FALSE,
+            0,
+            NULL,
+            NULL,
+            &si,
+            &pi )
+        )
     {
         printf( "CreateProcess failed (%d).\n", GetLastError() );
         return false;
@@ -50,16 +50,16 @@ bool WebServer::Start(Environment& env)
     {
         ZeroMemory( &mysqlpi, sizeof(mysqlpi) );
         // Start the child process.
-        if(CreateProcess( NULL,   // No module name (use command line)
-                (LPSTR)env.BuildMySQLCommandLine().c_str(),        // Command line
-                NULL,           // Process handle not inheritable
-                NULL,           // Thread handle not inheritable
-                TRUE,          // Set handle inheritance to FALSE
-                0,              // No creation flags
-                NULL,           // Use parent's environment block
-                NULL,           // Use parent's starting directory
-                &si,            // Pointer to STARTUPINFO structure
-                &mysqlpi )      // Pointer to PROCESS_INFORMATION structure
+        if(CreateProcess( NULL,
+                (LPSTR)env.BuildMySQLCommandLine().c_str(),
+                NULL,
+                NULL,
+                TRUE,
+                0,
+                NULL,
+                NULL,
+                &si,
+                &mysqlpi )
             )
         {
             localPortFile << mysqlpi.dwProcessId << endl;
