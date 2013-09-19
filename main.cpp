@@ -54,6 +54,10 @@ int main(int argc, char*argv[])
             cout << "Stopping MySQL." << endl;
         srvr.Stop(env);
     }
+    else
+    {
+        srvr.Start(env);
+    }
 
     return StartSystray(&srvr, &env);
 }

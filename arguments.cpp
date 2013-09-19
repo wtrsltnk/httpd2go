@@ -6,12 +6,7 @@ using namespace std;
 Arguments::Arguments(int argc, char* argv[])
     : _ok(false), _stop(false), _delete(false)
 {
-    if (argc < 2)
-    {
-        cout << "No arguments given, need atleast the full project path." << endl;
-        this->PrintHelp();
-    }
-    else
+    if (argc >= 2)
     {
         if (string(argv[1]) == "--help")
             this->PrintHelp();
