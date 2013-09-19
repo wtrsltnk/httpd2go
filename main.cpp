@@ -12,6 +12,9 @@ using namespace std;
 
 int main(int argc, char*argv[])
 {
+    HWND hWnd = GetConsoleWindow();
+    ShowWindow( hWnd, SW_HIDE );
+
     Arguments args(argc, argv);
     WebServer srvr;
     Environment env;
