@@ -31,6 +31,14 @@ int main(int argc, char*argv[])
                 srvr.Start(env);
                 cout << "Bye!" << endl;
             }
+            else
+            {
+                cout << "Starting webserver." << endl;
+                cout << "Remove the project by running: httpd2go.exe --delete " << args.ProjectName() << endl;
+                cout << "Stop the webserver by stopping this instance or running: httpd2go.exe --stop" << endl;
+                srvr.Start(env);
+                cout << "Bye!" << endl;
+            }
         }
     }
     else if (args.Delete())

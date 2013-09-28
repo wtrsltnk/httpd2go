@@ -109,6 +109,9 @@ Environment::~Environment()
 
 std::string Environment::CreateProject(const std::string& projectFolder, const std::string& projectName)
 {
+    if (projectName == "")
+        return "";
+
     string projectConf = this->_vhostsDirectory + projectName + ".conf";
     string projectPort;
     if (Environment::FileExists(projectConf))
