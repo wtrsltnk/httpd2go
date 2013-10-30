@@ -907,6 +907,7 @@ void WritePhpIni(std::ofstream& stream) {
 	stream << "extension=php_sqlite3.dll\n";
 	stream << ";extension=php_sybase_ct.dll\n";
 	stream << ";extension=php_tidy.dll\n";
+    stream << "zend_extension=php_xdebug-2.2.3-5.5-vc11.dll\n";
 	stream << ";extension=php_xmlrpc.dll\n";
 	stream << ";extension=php_xsl.dll\n";
 	stream << ";extension=php_zip.dll\n";
@@ -1865,4 +1866,8 @@ void WritePhpIni(std::ofstream& stream) {
 	stream << "; Local Variables:\n";
 	stream << "; tab-width: 4\n";
 	stream << "; End:\n";
+    stream << "\n";
+    stream << "[xdebug]\n";
+    stream << "\n";
+    stream << "xdebug.remote_enable=On\n";
 }
