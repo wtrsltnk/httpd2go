@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "tokenizer.h"
+#include "common/tokenizer.h"
 
 using namespace std;
 
